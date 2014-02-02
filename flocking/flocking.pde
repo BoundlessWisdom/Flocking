@@ -2,9 +2,12 @@ ArrayList<Bird> birds = new ArrayList<Bird>();
 ScrollBar[] bars = new ScrollBar[8];
 String[] titles = {"Cohere", "Avoid", "Align","Max Speed","Max Steering","Cohere distance","Avoid distance","Align distance"};
 PVector mouse = new PVector();
+int width = 800;
+int height = 600;
+Bird[][] space = new Bird[width + 1][height + 1];
 
 void setup() {
-  size(800, 600);
+  size(width, height);
   for (int i = 0; i < 25; i++) {
     birds.add(new Bird(random(width), random(height)));
   }
@@ -12,6 +15,7 @@ void setup() {
     bars[i] = new ScrollBar(25, 50+i*50, 150,15,titles[i]);
   }
 }
+
 void draw() {
   mouse.set(mouseX, mouseY);
   background(50);
@@ -28,10 +32,3 @@ void draw() {
 void keyPressed() {
   birds.add(new Bird(mouseX, mouseY));
 }
-
-//void mouseReleased(){
-// for(int i = 0; i < bars.length; i++){
-//  bars[i].chosen = false;
-// } 
-//}
-
