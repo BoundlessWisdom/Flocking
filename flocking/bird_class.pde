@@ -52,6 +52,7 @@ class Bird {
     applyForce(coh);
     applyForce(avo);
     applyForce(ali);
+    collide();
   }
 
   void applyForce(PVector force) {
@@ -143,7 +144,7 @@ class Bird {
     for(int i = -1; i < 2; i++) {
       for(int j = -1; j < 2; j++) {
         if(i != 0 || j != 0) {
-          Bird other = space[(int)loc.x][(int)loc.y];
+          Bird other = space[(int)loc.x + i][(int)loc.y + j];
           if(other != null) {
             applyForce(mult(PVector.sub(loc, other.loc), 100));
             other.applyForce(mult(PVector.sub(other.loc, loc), 100));
