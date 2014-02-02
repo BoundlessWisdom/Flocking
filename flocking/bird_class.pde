@@ -25,12 +25,14 @@ class Bird {
     popMatrix();
   }
   void update() {
+    space[(int)loc.x][(int)loc.y] = null;
     maxspeed =map(bars[3].position(), 0, 1, 0, 15);
     maxforce = map(bars[4].position(),0,1,0,.4);
     vel.add(acc);
     vel.limit(maxspeed);
     loc.add(vel);
     wrap();
+    place();
     acc.set(0, 0);
   }
 
@@ -136,7 +138,26 @@ class Bird {
       return new PVector(0, 0);
     }
   }
-
+  
+  void collide() {
+    for(int i = -1; i < 2; i++) {
+      for(int j = -1; j < 2; j++) {
+        if(i != 0 || j != 0) {
+          Bird other = space[(int)loc.x][(int)loc.y];
+          if(other != null) {
+            applyForce(mult(PVector.sub(loc, other.loc), 100));
+            other.applyForce(mult(PVector.sub(other.loc, loc), 100));
+  } } } } }
+  
+  PVector mult(PVector vector, int factor) {
+    vector.mult(factor);
+    return vector;
+  }
+  
+  void place() {
+    space[loc.x][loc.y] = this;
+  }
+  
   void wrap() {
     if (loc.x < 0) {
       loc.x = width;
