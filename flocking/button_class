@@ -1,0 +1,60 @@
+class Button {
+  PVector loc;
+  PVector size;
+  String name;
+  boolean chosen;
+  boolean down;
+  public boolean pressed;
+  
+  Button(float x, float y, float w, float h, String n) {
+    loc = new PVector(x, y);
+    size = new PVector(w, h);
+    name = n;
+    chosen = false;
+    down = false;
+    pressed = false;
+  }
+  
+  void run() {
+    overbutton();
+    click();
+    display();
+  }
+  
+  void overbutton() {
+    if (mouseX > loc.x-size.x/2 && mouseX < loc.x + size.x/2 && mouseY > loc.y -size.y/2 && mouseY < loc.y + size.y/2) {
+      chosen = true;
+    }
+    else {
+      chosen = false;
+    }
+  }
+  
+  void click() {
+    if (chosen && mousePressed && !down) {
+      pressed = !pressed;
+      down = true;
+    }
+    if (!mousePressed) {
+      down = false;
+    }
+  }
+  
+  void display() {
+    rectMode(CENTER);
+    noStroke();
+    fill(255);
+    text(name, loc.x-size.x/2, loc.y-size.y/2-5);
+    fill(255, 50);
+    rect(loc.x, loc.y, size.x, size.y);    
+    stroke(0);
+    if (pressed) {
+      fill(255, 0, 0, 150);
+    }
+    else {
+      fill(255, 150);
+    }
+    rect(loc.x, loc.y, size.x, size.y);
+    line(loc.x-size.x/2, loc.y, loc.x + size.x/2, loc.y);
+  }
+}
