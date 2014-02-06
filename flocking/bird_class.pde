@@ -1,4 +1,5 @@
 class Bird {
+  ArrayList<Bird> flock;
   PVector loc, vel, acc;
   int size;
   float maxspeed;
@@ -12,6 +13,9 @@ class Bird {
     size = 10;
     maxspeed = 5;
     maxforce = .06;
+  }
+  void flockWith(ArrayList<Bird> newFlock) {
+    flock = newFlock;
   }
 
   void display() {
@@ -36,7 +40,7 @@ class Bird {
     acc.set(0, 0);
   }
 
-  void flock(ArrayList<Bird> everyone) {
+  void flock() {
 
     PVector coh = cohere(everyone);
     PVector avo = avoid(everyone);
@@ -52,6 +56,9 @@ class Bird {
     applyForce(coh);
     applyForce(avo);
     applyForce(ali);
+    if (buttons[0].pressed) {
+      applyForce(follow());
+    }
     collide();
   }
 
@@ -70,7 +77,7 @@ class Bird {
     int count = 0;
     float neighborhood = navo;
     PVector sum = new PVector();
-    for (Bird other : birds) {
+    for (Bird other : everybody) {
       float d = loc.dist(other.loc);
       if (d > 0 && d < neighborhood) {
         PVector diff = PVector.sub(loc, other.loc);
@@ -95,7 +102,7 @@ class Bird {
     int count = 0;
     float neighborhood = nali;
     PVector sum = new PVector();
-    for (Bird other : birds) {
+    for (Bird other : everybody) {
       float d = loc.dist(other.loc);
       if (d > 0 && d < neighborhood) {
         sum.add(other.vel);
@@ -119,7 +126,7 @@ class Bird {
     int count = 0;
     float neighborhood = ncoh;
     PVector sum = new PVector();
-    for (Bird other : birds) {
+    for (Bird other : everybody) {
       float d = loc.dist(other.loc);
       if (d > 0 && d < neighborhood) {
         sum.add(other.loc);
@@ -129,6 +136,21 @@ class Bird {
     if (count > 0) {
       sum.div(count);
       PVector desired = PVector.sub(sum, loc);
+      desired.normalize();
+      desired.mult(maxspeed);
+      PVector steer = PVector.sub(desired, vel);
+      steer.limit(maxforce);
+      return steer;
+    }
+    else {
+      return new PVector(0, 0);
+    }
+  }
+  
+  PVector follow() {
+    PVector lure = new PVector(mouseX, mouseY);
+    if (lure.x > 0 && lure.x < width && lure.y > 0 && lure.y < height) {
+      PVector desired = PVector.sub(lure, loc);
       desired.normalize();
       desired.mult(maxspeed);
       PVector steer = PVector.sub(desired, vel);
