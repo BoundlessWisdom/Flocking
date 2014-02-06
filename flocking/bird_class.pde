@@ -75,7 +75,7 @@ class Bird {
   }
   PVector avoid(ArrayList<Bird> everybody) {
     int count = 0;
-    float neighborhood = navo;
+    float neighborhood = 50;
     PVector sum = new PVector();
     for (Bird other : everybody) {
       float d = loc.dist(other.loc);
@@ -100,7 +100,7 @@ class Bird {
   }
   PVector align(ArrayList<Bird> everybody) {
     int count = 0;
-    float neighborhood = nali;
+    float neighborhood = 100;
     PVector sum = new PVector();
     for (Bird other : everybody) {
       float d = loc.dist(other.loc);
@@ -124,7 +124,7 @@ class Bird {
 
   PVector cohere(ArrayList<Bird> everybody) {
     int count = 0;
-    float neighborhood = ncoh;
+    float neighborhood = 100;
     PVector sum = new PVector();
     for (Bird other : everybody) {
       float d = loc.dist(other.loc);
