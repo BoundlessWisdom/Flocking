@@ -1,5 +1,5 @@
 class Bird {
-  ArrayList<Bird> flock;
+  int flock;
   PVector loc, vel, acc;
   int size;
   float maxspeed;
