@@ -53,10 +53,16 @@ void draw() {
 }
 
 void keyPressed() {
-  int r = (int)random(flocks.length);
-  if (r == flocks.length) { r -= 1; }
-  for (int i = 0; i < 10; i++) {
-    addBird(r, mouseX, mouseY);
+  if (key > '0' && key < ':' && key - 49 < flocks.length) {
+    for (int i = 0; i < 10; i++) {
+      addBird(key - 49, mouseX, mouseY);
+    }
+  } else {
+    int r = (int)random(flocks.length);
+    if (r == flocks.length) { r -= 1; }
+    for (int i = 0; i < 10; i++) {
+      addBird(r, mouseX, mouseY);
+    }
   }
 }
 
