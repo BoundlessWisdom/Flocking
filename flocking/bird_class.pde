@@ -59,10 +59,12 @@ class Bird {
     applyForce(coh);
     applyForce(avo);
     applyForce(ali);
-    if (buttons[0].pressed) {
+    if (buttons[1].pressed) {
       applyForce(follow());
     }
-    collide();
+    if (buttons[0].pressed) {
+      collide();
+    }
   }
 
   void applyForce(PVector force) {
