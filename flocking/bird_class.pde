@@ -1,4 +1,12 @@
-Bird(float x, float y) {
+class Bird {
+  ArrayList<Bird> flock;
+  PVector loc, vel, acc;
+  int size;
+  float maxspeed;
+  float maxforce;
+  float ncoh,nali,navo;
+
+  Bird(float x, float y) {
     loc = new PVector(x, y);
     vel = PVector.random2D();
     acc = new PVector();
@@ -184,6 +192,7 @@ Bird(float x, float y) {
       return max;
     }
     return attr;
+  }
   
   void wrap() {
     if (loc.x < 0) {
