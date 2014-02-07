@@ -2,8 +2,8 @@ ArrayList<Bird> birds = new ArrayList<Bird>();
 ArrayList[] flocks = new ArrayList[2];
 ScrollBar[] bars = new ScrollBar[5];
 String[] bartitles = {"Cohere", "Avoid", "Align","Max Speed","Max Steering"/*,"Cohere distance","Avoid distance","Align distance"*/};
-Button[] buttons = new Button[1];
-String[] buttontitles = {"Follow"};
+Button[] buttons = new Button[2];
+String[] buttontitles = {"Collide", "Follow"};
 PVector mouse = new PVector();
 int width = 800;
 int height = 600;
@@ -26,7 +26,7 @@ void setup() {
     bars[i] = new ScrollBar(25, 50+i*50, 150, 15, bartitles[i]);
   }
   for (int i = 0; i < buttons.length; i++) {
-    buttons[i] = new Button(40+i*50, 50 + bars.length*50, 15, 15, buttontitles[i]);
+    buttons[i] = new Button(33+i*50, 50 + bars.length*50, 15, 15, buttontitles[i]);
   }
 }
 void addBird(int f, float x, float y) {
@@ -65,4 +65,3 @@ void keyPressed() {
     }
   }
 }
-
