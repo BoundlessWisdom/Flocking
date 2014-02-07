@@ -1,7 +1,7 @@
 ArrayList<Bird> birds = new ArrayList<Bird>();
-ArrayList[] flocks = new ArrayList[3];
-ScrollBar[] bars = new ScrollBar[8];
-String[] bartitles = {"Cohere", "Avoid", "Align","Max Speed","Max Steering","Cohere distance","Avoid distance","Align distance"};
+ArrayList[] flocks = new ArrayList[2];
+ScrollBar[] bars = new ScrollBar[5];
+String[] bartitles = {"Cohere", "Avoid", "Align","Max Speed","Max Steering"/*,"Cohere distance","Avoid distance","Align distance"*/};
 Button[] buttons = new Button[1];
 String[] buttontitles = {"Follow"};
 PVector mouse = new PVector();
@@ -15,25 +15,25 @@ void setup() {
     flocks[i] = new ArrayList<Bird>();
   }
   for (float i = 0; i < flocks.length*5; i++) {
-    addBird((int)(i/5.0f));
+    addBird((int)(i/5.0f), random(width), random(height));
   }
   for (int i = 0; i < 15; i++) {
     int r = (int)random(flocks.length);
-    if(r == 3) { r = 2; }
-    addBird(r);
+    if (r == flocks.length) { r -= 1; }
+    addBird(r, random(width), random(height));
   }
   for (int i = 0; i < bars.length; i++) {
     bars[i] = new ScrollBar(25, 50+i*50, 150, 15, bartitles[i]);
   }
   for (int i = 0; i < buttons.length; i++) {
-    buttons[i] = new Button(40+i*50, bars.length*50, 15, 15, buttontitles[i]);
+    buttons[i] = new Button(40+i*50, 50 + bars.length*50, 15, 15, buttontitles[i]);
   }
 }
-void addBird(int f) {
-  Bird bird = new Bird(random(width), random(height));
+void addBird(int f, float x, float y) {
+  Bird bird = new Bird(x, y);
   birds.add(bird);
   flocks[f].add(bird);
-  bird.flockWith(flocks[f]);
+  bird.flockWith(f);
 }
 
 void draw() {
@@ -41,6 +41,9 @@ void draw() {
   background(50);
   for (int i = 0; i < bars.length; i++) {
     bars[i].run();
+  }
+  for (int i = 0; i < buttons.length; i++) {
+    buttons[i].run();
   }
   for (Bird b : birds) {
     b.display();
@@ -50,5 +53,10 @@ void draw() {
 }
 
 void keyPressed() {
-  birds.add(new Bird(mouseX, mouseY));
+//  int r = (int)random(flocks.length);
+//  if (r == flocks.length) { r -= 1; }
+  for (int i = 0; i < 10; i++) {
+    addBird(0, mouseX, mouseY);
+  }
 }
+
