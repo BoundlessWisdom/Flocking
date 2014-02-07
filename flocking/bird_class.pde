@@ -1,12 +1,4 @@
-class Bird {
-  ArrayList<Bird> flock;
-  PVector loc, vel, acc;
-  int size;
-  float maxspeed;
-  float maxforce;
-  float ncoh,nali,navo;
-
-  Bird(float x, float y) {
+Bird(float x, float y) {
     loc = new PVector(x, y);
     vel = PVector.random2D();
     acc = new PVector();
@@ -14,17 +6,19 @@ class Bird {
     maxspeed = 5;
     maxforce = .06;
   }
-  void flockWith(ArrayList<Bird> newFlock) {
-    flock = newFlock;
+  void flockWith(int flock) {
+    this.flock = flock;
   }
 
   void display() {
     pushMatrix();
     translate(loc.x, loc.y);
     rotate(vel.heading());
-    stroke(255);
+    stroke(0, 255, 0);
+    if (flock == 1) { stroke(255); }
     strokeWeight(3);
-    fill(150);
+    fill(0, 150, 0);
+    if (flock == 1) { fill(150); }
     triangle(-size/2, -size/2, -size/2, size/2, size, 0);
     popMatrix();
   }
@@ -32,6 +26,7 @@ class Bird {
     space[bind((int)loc.x, 0, width)][bind((int)loc.y, 0, height)] = null;
     maxspeed =map(bars[3].position(), 0, 1, 0, 15);
     maxforce = map(bars[4].position(),0,1,0,.4);
+//    acc.mult(size/10);
     vel.add(acc);
     vel.limit(maxspeed);
     loc.add(vel);
@@ -42,16 +37,16 @@ class Bird {
 
   void flock() {
 
-    PVector coh = cohere(everyone);
-    PVector avo = avoid(everyone);
-    PVector ali = align(everyone);
+    PVector coh = cohere(flocks[flock]);
+    PVector avo = avoid(flocks[flock]);
+    PVector ali = align(flocks[flock]);
 
     coh.mult(map(bars[0].position(), 0, 1, 0, 2.5));
-    ncoh = map(bars[5].position(),0,1,0,min(width,height));
+//    ncoh = map(bars[5].position(),0,1,0,min(width,height));
     avo.mult(map(bars[1].position(), 0, 1, 0, 2.5));
-    navo = map(bars[6].position(),0,1,0,min(width,height));
+//    navo = map(bars[6].position(),0,1,0,min(width,height));
     ali.mult(map(bars[2].position(), 0, 1, 0, 2.5));
-    nali = map(bars[7].position(),0,1,0,min(width,height));
+//    nali = map(bars[7].position(),0,1,0,min(width,height));
 
     applyForce(coh);
     applyForce(avo);
@@ -163,8 +158,8 @@ class Bird {
   }
   
   void collide() {
-    for(int i = -1; i < 2; i++) {
-      for(int j = -1; j < 2; j++) {
+    for(int i = -2; i < 3; i++) {
+      for(int j = -2; j < 3; j++) {
         if(i != 0 || j != 0) {
           Bird other = space[bind((int)loc.x + i, 0, width)][bind((int)loc.y + j, 0, height)];
           if(other != null) {
