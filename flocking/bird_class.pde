@@ -4,14 +4,13 @@ class Bird {
   int size;
   float maxspeed;
   float maxforce;
-  float ncoh,nali,navo;
 
   Bird(float x, float y) {
     loc = new PVector(x, y);
     vel = PVector.random2D();
     acc = new PVector();
-    size = 10;
-    maxspeed = 5;
+    size = (int)random(18) + 2;
+    maxspeed = 50/size;
     maxforce = .06;
   }
   void flockWith(int flock) {
@@ -34,7 +33,7 @@ class Bird {
     space[bind((int)loc.x, 0, width)][bind((int)loc.y, 0, height)] = null;
     maxspeed =map(bars[3].position(), 0, 1, 0, 15);
     maxforce = map(bars[4].position(),0,1,0,.4);
-//    acc.mult(size/10);
+    acc.mult(10/size);
     vel.add(acc);
     vel.limit(maxspeed);
     loc.add(vel);
@@ -50,11 +49,8 @@ class Bird {
     PVector ali = align(flocks[flock]);
 
     coh.mult(map(bars[0].position(), 0, 1, 0, 2.5));
-//    ncoh = map(bars[5].position(),0,1,0,min(width,height));
     avo.mult(map(bars[1].position(), 0, 1, 0, 2.5));
-//    navo = map(bars[6].position(),0,1,0,min(width,height));
     ali.mult(map(bars[2].position(), 0, 1, 0, 2.5));
-//    nali = map(bars[7].position(),0,1,0,min(width,height));
 
     applyForce(coh);
     applyForce(avo);
@@ -172,10 +168,13 @@ class Bird {
       for(int j = -2; j < 3; j++) {
         if(i != 0 || j != 0) {
           Bird other = space[bind((int)loc.x + i, 0, width)][bind((int)loc.y + j, 0, height)];
-          if(other != null) {
-            applyForce(mult(PVector.sub(loc, other.loc), 100));
-            other.applyForce(mult(PVector.sub(other.loc, loc), 100));
-  } } } } }
+          if (other != null) {
+            if (buttons[3].pressed) {
+              
+            } else {
+              applyForce(mult(PVector.sub(loc, other.loc), 100));
+              other.applyForce(mult(PVector.sub(other.loc, loc), 100));
+  } } } } } }
   
   PVector mult(PVector vector, int factor) {
     vector.mult(factor);
