@@ -1,9 +1,12 @@
+import java.util.Arrays;
+
 ArrayList<Bird> birds = new ArrayList<Bird>();
 ArrayList[] flocks = new ArrayList[2];
 ScrollBar[] bars = new ScrollBar[5];
-String[] bartitles = {"Cohere", "Avoid", "Align","Max Speed","Max Steering"/*,"Cohere distance","Avoid distance","Align distance"*/};
-Button[] buttons = new Button[2];
-String[] buttontitles = {"Collide", "Follow"};
+String[] bartitles = {"Cohere", "Avoid", "Align", "Max Speed", "Max Steering"};
+Button[] buttons = new Button[4];
+String[] buttontitles = {"Collide", "Follow", "Random Coordinates", "Smash"};
+int[] nextLine = {1, 0, 1, 1};
 PVector mouse = new PVector();
 int width = 800;
 int height = 600;
@@ -14,8 +17,8 @@ void setup() {
   for (int i = 0; i < flocks.length; i++) {
     flocks[i] = new ArrayList<Bird>();
   }
-  for (float i = 0; i < flocks.length*5; i++) {
-    addBird((int)(i/5.0f), random(width), random(height));
+  for (int i = 0; i < flocks.length*5; i++) {
+    addBird(i/5, random(width), random(height));
   }
   for (int i = 0; i < 15; i++) {
     int r = (int)random(flocks.length);
@@ -25,8 +28,12 @@ void setup() {
   for (int i = 0; i < bars.length; i++) {
     bars[i] = new ScrollBar(25, 50+i*50, 150, 15, bartitles[i]);
   }
+  int lines = 0;
+  int line = 0;
   for (int i = 0; i < buttons.length; i++) {
-    buttons[i] = new Button(33+i*50, 50 + bars.length*50, 15, 15, buttontitles[i]);
+    lines += nextLine[i];
+    line ++;  line -= nextLine[i]*line;
+    buttons[i] = new Button(33+line*50, lines*50 + bars.length*50, 15, 15, buttontitles[i]);
   }
 }
 void addBird(int f, float x, float y) {
@@ -55,13 +62,35 @@ void draw() {
 void keyPressed() {
   if (key > '0' && key < ':' && key - 49 < flocks.length) {
     for (int i = 0; i < 10; i++) {
-      addBird(key - 49, mouseX, mouseY);
+      addBird(key - 49, giveX(), giveY());
     }
   } else {
     int r = (int)random(flocks.length);
     if (r == flocks.length) { r -= 1; }
     for (int i = 0; i < 10; i++) {
-      addBird(r, mouseX, mouseY);
+      addBird(r, giveX(), giveY());
     }
   }
+  
+  if (key == '0') {
+    birds = new ArrayList<Bird>();
+    flocks = new ArrayList[1];
+    for (ArrayList f : flocks) {
+      f = new ArrayList<Bird>();
+    }
+    space = new Bird[width + 1][height + 1];
+  }
+  
+  if (key == 'c') {
+    
+  }
+}
+
+float giveX() {
+  if (buttons[2].pressed) { return random(width); }
+  return mouseX;
+}
+float giveY() {
+  if (buttons[2].pressed) { return random(height); }
+  return mouseY;
 }
