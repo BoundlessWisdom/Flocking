@@ -1,41 +1,61 @@
 class Bird {
-  int flock;
+  final int flock;
   PVector loc, vel, acc;
   int size;
   float maxspeed;
+  float maxsteer;
   float maxforce;
 
-  Bird(float x, float y) {
+  Bird(int f, float x, float y) {
+    flock = f;
     loc = new PVector(x, y);
     vel = PVector.random2D();
     acc = new PVector();
-    size = (int)random(18) + 2;
-    maxspeed = 50/size;
-    maxforce = .06;
-  }
-  void flockWith(int flock) {
-    this.flock = flock;
+    size = (int)random(12) + 3;
+    maxspeed = 5;
+    maxsteer = .06;
   }
 
   void display() {
     pushMatrix();
     translate(loc.x, loc.y);
     rotate(vel.heading());
-    stroke(0, 255, 0);
-    if (flock == 1) { stroke(255); }
-    strokeWeight(3);
-    fill(0, 150, 0);
-    if (flock == 1) { fill(150); }
     triangle(-size/2, -size/2, -size/2, size/2, size, 0);
     popMatrix();
   }
+  void displayColor() {
+    switch (flock) {
+    case 0:
+      stroke(255);
+      fill(150);
+      return;
+    case 1:
+      stroke(0, 255, 0);
+      fill(0, 150, 0);
+      return;
+    case 2:
+      stroke(255, 0, 0);
+      fill(150, 0, 0);
+      return;
+    case 3:
+      stroke(5, 5, 255);
+      fill(50, 50, 150);
+      return;
+    default:
+      stroke(0);
+      fill(0);
+    }
+  }
   void update() {
     space[bind((int)loc.x, 0, width)][bind((int)loc.y, 0, height)] = null;
-    maxspeed =map(bars[3].position(), 0, 1, 0, 15);
-    maxforce = map(bars[4].position(),0,1,0,.4);
-    acc.mult(10/size);
+    maxspeed = map(bars[3].position(), 0, 1, 0, 15);
+    maxsteer = map(bars[4].position(), 0, 1, 0, .4);
+    acc.mult(10.0f/size);
     vel.add(acc);
     vel.limit(maxspeed);
+    if (buttons[0].pressed) {
+      collide();
+    }
     loc.add(vel);
     wrap();
     place();
@@ -55,11 +75,8 @@ class Bird {
     applyForce(coh);
     applyForce(avo);
     applyForce(ali);
-    if (buttons[1].pressed) {
+    if (buttons[3].pressed) {
       applyForce(follow());
-    }
-    if (buttons[0].pressed) {
-      collide();
     }
   }
 
@@ -69,9 +86,9 @@ class Bird {
   PVector seek(PVector target) {
     PVector desired = PVector.sub(target, loc);
     desired.normalize();
-    desired.mult(maxspeed); 
+    desired.mult(maxspeed);
     PVector steer = PVector.sub(desired, vel);
-    steer.limit(maxforce);
+    steer.limit(maxsteer);
     return steer;
   }
   PVector avoid(ArrayList<Bird> everybody) {
@@ -92,7 +109,7 @@ class Bird {
       sum.normalize();
       sum.mult(maxspeed);
       PVector steer = PVector.sub(sum, vel);
-      steer.limit(maxforce);
+      steer.limit(maxsteer);
       return steer;
     }
     else {
@@ -115,7 +132,7 @@ class Bird {
       sum.normalize();
       sum.mult(maxspeed);
       PVector steer = PVector.sub(sum, vel);
-      steer.limit(maxforce);
+      steer.limit(maxsteer);
       return steer;
     }
     else {
@@ -140,7 +157,7 @@ class Bird {
       desired.normalize();
       desired.mult(maxspeed);
       PVector steer = PVector.sub(desired, vel);
-      steer.limit(maxforce);
+      steer.limit(maxsteer);
       return steer;
     }
     else {
@@ -155,7 +172,7 @@ class Bird {
       desired.normalize();
       desired.mult(maxspeed);
       PVector steer = PVector.sub(desired, vel);
-      steer.limit(maxforce);
+      steer.limit(maxsteer);
       return steer;
     }
     else {
@@ -169,11 +186,15 @@ class Bird {
         if(i != 0 || j != 0) {
           Bird other = space[bind((int)loc.x + i, 0, width)][bind((int)loc.y + j, 0, height)];
           if (other != null) {
-            if (buttons[3].pressed) {
-              
-            } else {
+            if (other.flock != this.flock) {
+              if (buttons[1].pressed || buttons[4].pressed) {
+                addExplosion(flock, loc);
+              }
               applyForce(mult(PVector.sub(loc, other.loc), 100));
               other.applyForce(mult(PVector.sub(other.loc, loc), 100));
+              if (buttons[1].pressed) {
+                //Destroy bird.
+              }
   } } } } } }
   
   PVector mult(PVector vector, int factor) {
