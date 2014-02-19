@@ -22,7 +22,7 @@ class ScrollBar {
   }
 
   void display() {
-    rectMode(CENTER);  
+    rectMode(CENTER);
     noStroke();
     fill(255);
     text(name, loc.x-size.x/2, loc.y-size.y/2-5);
@@ -111,7 +111,7 @@ class Button {
     fill(255);
     text(name, loc.x-size.x/2, loc.y-size.y/2-5);
     fill(255, 50);
-    rect(loc.x, loc.y, size.x, size.y);    
+    rect(loc.x, loc.y, size.x, size.y);
     stroke(0);
     if (pressed) {
       if (chosen) {
@@ -128,5 +128,17 @@ class Button {
       }
     }
     rect(loc.x, loc.y, size.x, size.y);
+  }
+}
+
+
+
+static class Selector {
+  static void run() {
+    
+  }
+  
+  static void scroll(int mod) {
+    
   }
 }
