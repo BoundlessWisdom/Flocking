@@ -1,19 +1,31 @@
 class Bird {
   final int flock;
+  final int flockIndex;
   PVector loc, vel, acc;
   int size;
   float maxspeed;
   float maxsteer;
-  float maxforce;
 
-  Bird(int f, float x, float y) {
+  Bird(int f, float x, float y, int i) {
     flock = f;
+    flockIndex = i;
     loc = new PVector(x, y);
     vel = PVector.random2D();
     acc = new PVector();
     size = (int)random(12) + 3;
     maxspeed = 5;
     maxsteer = .06;
+  }
+  
+  Bird(int f, int i, PVector v0, PVector v1, PVector v2, int s, float sp, float st) {
+    flock = f;
+    flockIndex = i;
+    loc = v0;
+    vel = v1;
+    acc = v2;
+    size = s;
+    maxspeed = sp;
+    maxsteer = st;
   }
 
   void display() {
@@ -48,8 +60,8 @@ class Bird {
   }
   void update() {
     space[bind((int)loc.x, 0, width)][bind((int)loc.y, 0, height)] = null;
-    maxspeed = map(bars[3].position(), 0, 1, 0, 15);
-    maxsteer = map(bars[4].position(), 0, 1, 0, .4);
+    maxspeed = variables[3];
+    maxsteer = variables[4];
     acc.mult(10.0f/size);
     vel.add(acc);
     vel.limit(maxspeed);
@@ -68,9 +80,9 @@ class Bird {
     PVector avo = avoid(flocks[flock]);
     PVector ali = align(flocks[flock]);
 
-    coh.mult(map(bars[0].position(), 0, 1, 0, 2.5));
-    avo.mult(map(bars[1].position(), 0, 1, 0, 2.5));
-    ali.mult(map(bars[2].position(), 0, 1, 0, 2.5));
+    coh.mult(variables[0]);
+    avo.mult(variables[1]);
+    ali.mult(variables[2]);
 
     applyForce(coh);
     applyForce(avo);
@@ -197,6 +209,11 @@ class Bird {
               }
   } } } } } }
   
+  void destroy() {
+    destroyList.add(flockIndex - destroyCount[flock]);
+    destroyCount[flock]++;
+  }
+  
   PVector mult(PVector vector, int factor) {
     vector.mult(factor);
     return vector;
@@ -229,5 +246,26 @@ class Bird {
     if (loc.y > height) {
       loc.y = 0;
     }
+  }
+}
+
+
+
+class newBird extends Bird {
+  final int expireTime = 100;
+  int time = 0;
+  
+  void update() {
+    super.update();
+    time++;
+    if (time == expireTime) {
+      flocks[flock].set(flockIndex - destroyCount[flock], new Bird(flock, flockIndex, loc, vel, acc, size, maxspeed, maxsteer));
+    }
+  }
+  
+  void collide() {}
+  
+  newBird(int f, float x, float y, int i) {
+    super(f, x, y, i);
   }
 }
