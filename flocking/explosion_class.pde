@@ -25,7 +25,7 @@ class Explosion {
   
   void boom() {
     size += .5;
-    stroke(r, g, b);  //Switch to fading circles later.
+    stroke(r, g, b);
     for (int i = 0; i < 5; i++) {
       
       if (size - i > 0 && size - i < range) {
