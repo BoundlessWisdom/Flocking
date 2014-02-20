@@ -1,14 +1,16 @@
 import java.util.Arrays;
 
 PVector mouse = new PVector();
-int width = 1400;
-int height = 800;
+int width = 1000;
+int height = 700;
 
-ArrayList<Bird> birds = new ArrayList<Bird>();
-Bird[][] space = new Bird[width + 1][height + 1];
-int destroyCount = 0;
 ArrayList[] flocks = new ArrayList[5];
+int[] flockIndices = new int[flocks.length];
 int currentFlock = 0;
+
+Bird[][] space = new Bird[width + 1][height + 1];
+ArrayList<Integer> destroyList = new ArrayList<Integer>();
+int[] destroyCount = new int[flocks.length];
 
 ArrayList<Explosion> explosions = new ArrayList<Explosion>();
 int removeCount;
@@ -18,6 +20,8 @@ String[] bartitles = {"Cohere", "Avoid", "Align", "Max Speed", "Max Steering"};
 Button[] buttons = new Button[5];
 String[] buttontitles = {"Collide", "Smash", "Random Coordinates", "Follow", "Ripple"};
 int[] nextLine = {1, 0, 1, 1, 1};
+
+float[] variables = new float[bars.length];
 
 void setup() {
   size(width, height);
@@ -45,9 +49,10 @@ void setup() {
   ellipseMode(RADIUS);
 }
 void addBird(int f, float x, float y) {
-  Bird bird = new Bird(f, x, y);
-  birds.add(bird);
-  flocks[f].add(bird);
+  flocks[f].add(new Bird(f, x, y, flockIndices[f]++));
+}
+void addNewBird(int f, float x, float y) {
+  flocks[f].add(new newBird(f, x, y, flockIndices[f]++));
 }
 void addExplosion(int f, PVector loc) {
   explosions.add(new Explosion(loc, f));
@@ -65,6 +70,12 @@ void draw() {
   }
   Selector.run();
   
+  variables[0] = map(bars[0].position(), 0, 1, 0, 2.5);
+  variables[1] = map(bars[1].position(), 0, 1, 0, 2.5);
+  variables[2] = map(bars[2].position(), 0, 1, 0, 2.5);
+  variables[3] = map(bars[3].position(), 0, 1, 0, 15);
+  variables[4] = map(bars[4].position(), 0, 1, 0, .4);
+  
   for (int i = 0; i < flocks.length; i++) {
     ArrayList<Bird> flockToDraw = flocks[i];
     if (flockToDraw.size() > 0) {
@@ -75,6 +86,9 @@ void draw() {
       b.flock();
       b.update();
     }
+  }
+  for (Integer i : destroyList) {
+    
   }
   strokeWeight(1);
   removeCount = 0;
@@ -90,29 +104,30 @@ void draw() {
 void keyPressed() {
   if (key > '0' && key < ':' && key - 49 < flocks.length) {
     for (int i = 0; i < 10; i++) {
-      addBird(key - 49, giveX(), giveY());
+      addNewBird(key - 49, giveX(), giveY());
     }
   } else {
     int r = (int)random(flocks.length);
     if (r == flocks.length) { r -= 1; }
     for (int i = 0; i < 10; i++) {
-      addBird(r, giveX(), giveY());
+      addNewBird(r, giveX(), giveY());
     }
   }
   
   if (key == '0') {
-    birds = new ArrayList<Bird>();
     for (int i = 0; i < flocks.length; i++) {
       flocks[i] = new ArrayList<Bird>();
+      flockIndices[i] = 0;
+      destroyCount[i] = 0;
     }
     space = new Bird[width + 1][height + 1];
     
     explosions = new ArrayList<Explosion>();
   }
   
-  if (key == 'c') {
+//  if (key == 'c') {
     
-  }
+//  }
   
   if (keyCode == RIGHT) {
     Selector.scroll(1);
