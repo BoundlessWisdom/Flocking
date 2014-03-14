@@ -2,9 +2,11 @@ class Bird {
   final int flock;
   final int flockIndex;
   PVector loc, vel, acc;
-  int size;
+  float size;
   float maxspeed;
   float maxsteer;
+  
+  private boolean dead = false;
 
   Bird(int f, float x, float y, int i) {
     flock = f;
@@ -17,7 +19,7 @@ class Bird {
     maxsteer = .06;
   }
   
-  Bird(int f, int i, PVector v0, PVector v1, PVector v2, int s, float sp, float st) {
+  Bird(int f, int i, PVector v0, PVector v1, PVector v2, float s, float sp, float st) {
     flock = f;
     flockIndex = i;
     loc = v0;
@@ -26,6 +28,10 @@ class Bird {
     size = s;
     maxspeed = sp;
     maxsteer = st;
+  }
+  
+  Bird(Bird bird) {
+    this(bird.flock, bird.flockIndex, bird.loc, bird.vel, bird.acc, bird.size, bird.maxspeed, bird.maxsteer);
   }
 
   void display() {
@@ -36,6 +42,11 @@ class Bird {
     popMatrix();
   }
   void displayColor() {
+/*    if (dead) {
+      stroke(0);
+      fill(0);
+      return;
+    }*/
     switch (flock) {
     case 0:
       stroke(255);
@@ -59,7 +70,7 @@ class Bird {
     }
   }
   void update() {
-    space[bind((int)loc.x, 0, width)][bind((int)loc.y, 0, height)] = null;
+    leave();
     maxspeed = variables[3];
     maxsteer = variables[4];
     acc.mult(10.0f/size);
@@ -75,7 +86,6 @@ class Bird {
   }
 
   void flock() {
-
     PVector coh = cohere(flocks[flock]);
     PVector avo = avoid(flocks[flock]);
     PVector ali = align(flocks[flock]);
@@ -197,21 +207,44 @@ class Bird {
       for(int j = -2; j < 3; j++) {
         if(i != 0 || j != 0) {
           Bird other = space[bind((int)loc.x + i, 0, width)][bind((int)loc.y + j, 0, height)];
-          if (other != null) {
-            if (other.flock != this.flock) {
-              if (buttons[1].pressed || buttons[4].pressed) {
-                addExplosion(flock, loc);
-              }
+          if (other != null && other.flock != this.flock) {
               applyForce(mult(PVector.sub(loc, other.loc), 100));
               other.applyForce(mult(PVector.sub(other.loc, loc), 100));
               if (buttons[1].pressed) {
-                //Destroy bird.
+                if (this.dead || other.dead) {
+                  if (this.dead && other.dead) {}
+                  else if (this.dead) {
+                    addExplosion(other.flock, loc);
+                    other.destroy(this);
+                  } else {
+                    addExplosion(flock, loc);
+                    destroy(other);
+                  }
+                } else if (random(1) > 0.5f) {
+                  addExplosion(flock, loc);
+                  destroy(other);
+                } else {
+                  addExplosion(other.flock, loc);
+                  other.destroy(this);
+                }
               }
-  } } } } } }
+              else if (buttons[4].pressed) {
+                addExplosion(flock, loc);
+                setGhost();
+                other.setGhost();
+              }
+  } } } } }
   
-  void destroy() {
-    destroyList.add(flockIndex - destroyCount[flock]);
-    destroyCount[flock]++;
+  void destroy(Bird collider) {
+//    System.out.println(BirdColors.c(flock) + flockIndex + " destroyed by " + BirdColors.c(collider.flock) + collider.flockIndex);
+    dead = true;
+    destroyLists[flock].add(flockIndex);
+  }
+  
+  void setGhost() {
+    if (!dead) {
+      flocks[flock].set(find(), new ghostBird(flock, flockIndex, loc, vel, acc, size, maxspeed, maxsteer));
+    }
   }
   
   PVector mult(PVector vector, int factor) {
@@ -221,6 +254,10 @@ class Bird {
   
   void place() {
     space[bind((int)loc.x, 0, width)][bind((int)loc.y, 0, height)] = this;
+  }
+  
+  void leave() {
+    space[bind((int)loc.x, 0, width)][bind((int)loc.y, 0, height)] = null;
   }
   
   int bind(int attr, int min, int max) {
@@ -247,6 +284,30 @@ class Bird {
       loc.y = 0;
     }
   }
+  
+  int find() {
+    return find(flockIndex, flocks[flock].size());
+  }
+  int find(int target, int range) {
+    int max = range;
+    int min = 0;
+    int checkPoint = (max + min)/2;
+
+    for (int i = 0; i < range; i++) {
+      int attempt = flocks[flock].get(checkPoint).flockIndex;
+      if (attempt != target) {
+        if (attempt < target) {
+          min = checkPoint;
+        } else {
+          max = checkPoint;
+        }
+      } else {
+        return checkPoint;
+      }
+      checkPoint = (max + min)/2;
+    }
+    return range;
+  }
 }
 
 
@@ -259,7 +320,7 @@ class newBird extends Bird {
     super.update();
     time++;
     if (time == expireTime) {
-      flocks[flock].set(flockIndex - destroyCount[flock], new Bird(flock, flockIndex, loc, vel, acc, size, maxspeed, maxsteer));
+      flocks[flock].set(find(), new Bird(flock, flockIndex, loc, vel, acc, size, maxspeed, maxsteer));
     }
   }
   
@@ -267,5 +328,44 @@ class newBird extends Bird {
   
   newBird(int f, float x, float y, int i) {
     super(f, x, y, i);
+  }
+  
+  newBird(int f, int i, PVector v0, PVector v1, PVector v2, float s, float sp, float st) {
+    super(f, i, v0, v1, v2, s, sp, st);
+  }
+}
+
+class ghostBird extends newBird {
+  final int expireTime = 10;
+  
+  ghostBird(int f, int i, PVector v0, PVector v1, PVector v2, float s, float sp, float st) {
+    super(f, i, v0, v1, v2, s, sp, st);
+  }
+}
+
+/*class deadBird extends Bird {
+  final boolean dead = true;
+  
+  void flock() {}
+  
+  deadBird(Bird spirit) {
+    super(spirit);
+  }
+}*/
+
+static class BirdColors {
+  static String c(int flock) {
+    switch (flock) {
+      case 0:
+      return "white ";
+      case 1:
+      return "green ";
+      case 2:
+      return "red ";
+      case 3:
+      return "blue ";
+      default:
+      return "black ";
+    }
   }
 }
